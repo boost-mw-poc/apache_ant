@@ -105,50 +105,5 @@ file <samp>ISO.log</samp> using logging level of <q>verbose</q>.</p>
     ...
 </pre>
 
-<h3>Notes</h3>
-<p>There is some functionality that I would like to be able to add in the future.  They include
-things like the following:</p>
-<table class="attr">
-  <tr>
-    <th scope="col">Attribute</th>
-    <th scope="col">Description</th>
-    <th scope="col">Required</th>
-  </tr>
-  <tr>
-    <td>listener</td>
-    <td>A classname of a build listener to use from this point on instead of the default
-      listener.</td>
-    <td>No</td>
-  </tr>
-  <tr>
-    <td>includetarget</td>
-    <td rowspan="2">A comma-separated list of targets to automatically record.  If this value
-      is <q>all</q>, then all targets are recorded.</td>
-    <td>No; default is <q>all</q></td>
-  </tr>
-  <tr>
-    <td>excludetarget</td>
-    <td>No</td>
-  </tr>
-  <tr>
-    <td>includetask</td>
-    <td rowspan="2">A comma-separated list of tasks to automatically record or not.  This could be
-      difficult as it may conflict with the <code>includetarget/excludetarget</code>.
-      (e.g.: <code>includetarget=&quot;compile&quot; excludetask=&quot;javac&quot;</code>, what
-      should happen?)</td>
-    <td>No</td>
-  </tr>
-  <tr>
-    <td>excludetask</td>
-    <td>No</td>
-  </tr>
-  <tr>
-    <td>action</td>
-    <td>add greater flexibility to the <var>action</var> attribute.  Things like <q>close</q> to
-      close the print stream.</td>
-    <td>No</td>
-  </tr>
-</table>
-
 </body>
 </html>
