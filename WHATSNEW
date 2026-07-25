@@ -34,6 +34,10 @@ Fixed bugs:
    directory to the Java runtime Paths.
    Github Pull Request #230
 
+ * Inaccuracies in the documentation of the "record" task have been
+   fixed.
+   Bugzilla Report 70158
+
 Changes from Ant 1.10.16 TO Ant 1.10.17
 =======================================
 

@@ -55,15 +55,15 @@ a <q>buildFinished</q> event.</p>
     <td>action</td>
     <td>This tells the logger what to do: should it start recording or stop?  The first time that
       the recorder task is called for this logfile, and if this attribute is not provided, then the
-      default for this attribute is <q>start</q>.  If this attribute is not provided on subsequent
-      calls, then the state remains as previous.</td>
-    <td>No [values = <q>start|stop</q>, default = no state change]</td>
+      default for this attribute is <q>start</q>. If this attribute is not provided on subsequent
+      calls, then the state remains as previous. Value can be <q>start</q> or <q>stop</q>.</td>
+    <td>No</td>
   </tr>
   <tr>
     <td>append</td>
     <td>Should the recorder append to a file, or create a new one? This is only applicable the first
-      time this task is called for this file.</td>
-    <td>No [values = <q>start|stop</q>, default = no state change]</td>
+      time this task is called for this file. Value can be <q>yes</q> or <q>no</q>.</td>
+    <td>No; default is <q>no</q></td>
   </tr>
   <tr>
     <td>emacsmode</td>
@@ -73,11 +73,12 @@ a <q>buildFinished</q> event.</p>
   </tr>
   <tr>
     <td>loglevel</td>
-    <td>At what logging level should this recorder instance record to?  This is not a once only
+    <td>At what logging level should this recorder instance record to? This is not a once only
       parameter (like <var>append</var> is)&mdash;you can increase or decrease the logging level as
-      the build process continues.
+      the build process continues. Value can be <q>error</q>, <q>warn</q>, <q>info</q>,
+      <q>verbose</q> or <q>debug</q>.
     </td>
-    <td>No [values = <q>error|warn|info|verbose|debug</q>, default = no change]</td>
+    <td>No; default is <q>info</q></td>
   </tr>
 </table>
 
