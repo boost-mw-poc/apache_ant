@@ -48,7 +48,9 @@ a <q>buildFinished</q> event.</p>
   </tr>
   <tr>
     <td>name</td>
-    <td>The name of the file this logger is associated with.</td>
+    <td>The file path to which this recorder will record to. This can either be a absolute path or
+        a relative path.
+    </td>
     <td>Yes</td>
   </tr>
   <tr>
@@ -79,6 +81,15 @@ a <q>buildFinished</q> event.</p>
       <q>verbose</q> or <q>debug</q>.
     </td>
     <td>No; default is <q>info</q></td>
+  </tr>
+  <tr>
+    <td>relativeToBaseDir</td>
+    <td>If <q>name</q> is a relative file path then setting this to <q>yes</q> will treat the
+        file path as relative to the basedir of the project. A value of <q>no</q>, will treat
+        the relative file path as relative to the current working directory of the process.
+        <em>Since Ant 1.10.18</em>
+    </td>
+    <td>No; defaults to <q>no</q></td>
   </tr>
 </table>
 

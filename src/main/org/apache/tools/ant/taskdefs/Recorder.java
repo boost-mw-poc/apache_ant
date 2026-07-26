@@ -17,6 +17,8 @@
  */
 package org.apache.tools.ant.taskdefs;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -67,7 +69,9 @@ public class Recorder extends Task implements SubBuildListener {
     /** Strip task banners if true.  */
     private boolean emacsMode = false;
     /** The list of recorder entries. */
-    private static Map<String, RecorderEntry> recorderEntries = new Hashtable<>();
+    private static final Map<String, RecorderEntry> recorderEntries = new Hashtable<>();
+
+    private boolean relativeToBaseDir = false;
 
     //////////////////////////////////////////////////////////////////////
     // CONSTRUCTORS / INITIALIZERS
@@ -146,6 +150,24 @@ public class Recorder extends Task implements SubBuildListener {
         loglevel = level.getLevel();
     }
 
+    /**
+     * If this attribute is set to {@code true} and the {@code name} of the recorder is a relative
+     * path then the file path is considered relative to the
+     * {@linkplain Project#getBaseDir() project's basedir}. If this attribute is {@code false}
+     * and if the {@code name} of the recorder is a relative path, then the file path is considered
+     * relative to the current directory of the process.
+     * <p>
+     * The value of this attribute plays no role if the {@code name} of the recorder is
+     * an absolute path.
+     *
+     * @param relativeToBaseDir true if the recorder file is relative to {@code basedir},
+     *                          false otherwise
+     * @since Ant 1.10.18
+     */
+    public void setRelativeToBaseDir(final boolean relativeToBaseDir) {
+        this.relativeToBaseDir = relativeToBaseDir;
+    }
+
     //////////////////////////////////////////////////////////////////////
     // CORE / MAIN BODY
 
@@ -161,8 +183,21 @@ public class Recorder extends Task implements SubBuildListener {
         getProject().log("setting a recorder for name " + filename,
             Project.MSG_DEBUG);
 
+        final String filePath;
+        final boolean isAbsolutePath = Paths.get(filename).isAbsolute();
+        if (isAbsolutePath) {
+            filePath = filename;
+        } else {
+            if (relativeToBaseDir) {
+                final Path baseDir = getProject().getBaseDir().toPath();
+                filePath = baseDir.resolve(filename).toString();
+            } else {
+                final Path currentDir = Paths.get("");
+                filePath = currentDir.resolve(filename).toString();
+            }
+        }
         // get the recorder entry
-        RecorderEntry recorder = getRecorder(filename, getProject());
+        RecorderEntry recorder = getRecorder(filePath, getProject());
         // set the values on the recorder
         recorder.setMessageOutputLevel(loglevel);
         recorder.setEmacsMode(emacsMode);
