@@ -622,6 +622,17 @@
             else="">
       <not><isset property="withDoclint"/></not>
     </condition>
+
+    <condition property="cyclonedx.antlib.present">
+      <and>
+        <available
+            classname="org.apache.ant.cyclonedx.ComponentBomTask"
+            classpathref="classpath"
+            ignoresystemclasses="${ignoresystemclasses}"/>
+        <!-- https://github.com/CycloneDX/cyclonedx-core-java/issues/848 -->
+        <isset property="jdk9+"/>
+      </and>
+    </condition>
   </target>
 
   <!--
@@ -2228,11 +2239,9 @@ ${antunit.reports}
          CycloneDX targets - create SBOMs
        ===================================================================
   -->
-  <available property="cyclonedx.antlib.present"
-             classname="org.apache.ant.cyclonedx.ComponentBomTask"
-             classpathref="classpath" ignoresystemclasses="${ignoresystemclasses}"/>
-
-  <target name="-init-cyclonedx" if="cyclonedx.antlib.present">
+  <target name="-init-cyclonedx"
+          depends="check-optional-packages"
+          if="cyclonedx.antlib.present">
     <typedef uri="antlib:org.apache.ant.cyclonedx"
       resource="org/apache/ant/cyclonedx/antlib.xml">
       <classpath refid="classpath"/>
