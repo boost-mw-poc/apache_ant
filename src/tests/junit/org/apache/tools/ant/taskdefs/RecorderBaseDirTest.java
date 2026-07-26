@@ -75,7 +75,7 @@ public class RecorderBaseDirTest {
         buildRule.executeTarget("basedir-relative");
         final File expected = resolveFile(REC_IN + "rectest1.result");
         // expect the file to be generated in the basedir
-        final File actual = new File(buildRule.getProject().getBaseDir(), "recorded-out.txt");
+        final File actual = new File(buildRule.getProject().getBaseDir(), "recorded-out-1.txt");
         assertTrue("content mismatch in files \"" + expected + "\" and \"" + actual + "\"",
                 FILE_UTILS.contentEquals(expected, actual, true));
     }
