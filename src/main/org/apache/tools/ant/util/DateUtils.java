@@ -397,7 +397,7 @@ public final class DateUtils {
     }
 
     /**
-     * Name od the environment variable used to set timestamps for reproducible builds.
+     * Name of the environment variable used to set timestamps for reproducible builds.
      *
      * @see "https://reproducible-builds.org/docs/source-date-epoch/"
      * @since Ant 1.10.18
