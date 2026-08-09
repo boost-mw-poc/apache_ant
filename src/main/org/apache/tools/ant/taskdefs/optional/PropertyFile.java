@@ -193,10 +193,9 @@ public class PropertyFile extends Task {
             properties = new Properties();
         } else {
             LayoutPreservingProperties p = new LayoutPreservingProperties();
-            Map.Entry<Date, Boolean> now = DateUtils.getNow(getProject());
             Calendar c = Calendar.getInstance();
-            c.setTime(now.getKey());
-            TimeZone tz = Boolean.TRUE.equals(now.getValue())
+            c.setTime(getProject().getNow());
+            TimeZone tz = System.getenv(DateUtils.ENV_SOURCE_DATE_EPOCH) != null
                 ? TimeZone.getTimeZone("UTC") : null;
             p.setDateComment(c, tz);
             properties = p;

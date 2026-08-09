@@ -23,8 +23,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -35,6 +37,8 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
 import java.util.WeakHashMap;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.tools.ant.helper.DefaultExecutor;
@@ -48,6 +52,7 @@ import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.Resource;
 import org.apache.tools.ant.types.ResourceFactory;
 import org.apache.tools.ant.types.resources.FileResource;
+import org.apache.tools.ant.util.DateUtils;
 import org.apache.tools.ant.util.FileUtils;
 import org.apache.tools.ant.util.JavaEnvUtils;
 import org.apache.tools.ant.util.VectorSet;
@@ -2484,4 +2489,65 @@ public class Project implements ResourceFactory {
     public Resource getResource(final String name) {
         return new FileResource(getBaseDir(), name);
     }
+
+    /**
+     * Consults {@linkplain #ENV_SOURCE_DATE_EPOCH SOURCE_DATE_EPOCH} environment variable and
+     * the magic properties {@link MagicNames#TSTAMP_NOW_ISO} and {@link MagicNames#TSTAMP_NOW}
+     * for predefined values of "now" and falls back to {@code new Date()} if neither is set.
+     *
+     * <p>{@code SOURCE_DATE_EPOCH} takes precedence over {@link MagicNames#TSTAMP_NOW_ISO} which
+     * in turn takes precedence over {@link MagicNames#TSTAMP_NOW}.</p>
+     *
+     * @return "now" as explained above
+     * @since Ant 1.10.18
+     */
+    public Date getNow() {
+        final String epoch = System.getenv(DateUtils.ENV_SOURCE_DATE_EPOCH);
+        if (epoch != null) {
+            // Value of SOURCE_DATE_EPOCH will be an integer, representing seconds.
+            try {
+                Date d = new Date(Long.parseLong(epoch) * 1000L);
+                log("Honouring environment variable " + DateUtils.ENV_SOURCE_DATE_EPOCH
+                    + " which has been set to " + epoch);
+                return d;
+            } catch(NumberFormatException e) {
+                // ignore
+                log("Ignoring invalid value '" + epoch + "' for " + DateUtils.ENV_SOURCE_DATE_EPOCH
+                    + " environment variable", Project.MSG_DEBUG);
+            }
+        }
+        return getNowAsDate();
+    }
+
+    private Date getNowAsDate() {
+        Optional<Date> now = getNowAsDate(
+            MagicNames.TSTAMP_NOW_ISO,
+            s -> Date.from(Instant.parse(s)),
+            (k, v) -> "magic property " + k + " ignored as '" + v + "' is not in valid ISO pattern"
+        );
+        if (now.isPresent()) {
+            return now.get();
+        }
+
+        now = getNowAsDate(
+            MagicNames.TSTAMP_NOW,
+            s -> new Date(1000 * Long.parseLong(s)),
+            (k, v) -> "magic property " + k + " ignored as " + v + " is not a valid number"
+        );
+        return now.orElseGet(Date::new);
+    }
+
+    private Optional<Date> getNowAsDate(String propertyName, Function<String, Date> map,
+                                        BiFunction<String, String, String> log) {
+        String property = getProperty(propertyName);
+        if (property != null && !property.isEmpty()) {
+            try {
+                return Optional.ofNullable(map.apply(property));
+            } catch (Exception e) {
+                log(log.apply(propertyName, property));
+            }
+        }
+        return Optional.empty();
+    }
+
 }

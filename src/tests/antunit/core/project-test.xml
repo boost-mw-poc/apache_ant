@@ -15,7 +15,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project default="antunit" xmlns:au="antlib:org.apache.ant.antunit">
+<project default="antunit" name="project-test" xmlns:au="antlib:org.apache.ant.antunit">
   <import file="../antunit-base.xml" />
 
   <target name="-createNowPrinter">
@@ -24,7 +24,6 @@
     <echo file="${input}/NowPrinter.java"><![CDATA[
       import org.apache.tools.ant.BuildException;
       import org.apache.tools.ant.Project;
-      import org.apache.tools.ant.util.DateUtils;
       import java.text.SimpleDateFormat;
       import java.util.*;
       public class NowPrinter {
@@ -37,11 +36,10 @@
           for (int i = 0; i < argsLen; i += 2) {
             p.setProperty(args[i], args[i + 1]);
           }
-          Map.Entry<Date, Boolean> now = DateUtils.getNow(p);
+          Date now = p.getNow();
           SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
           format.setTimeZone(TimeZone.getTimeZone("UTC"));
-          System.out.println("NOW is " + format.format(now.getKey()));
-          System.out.println("REPRODUCIBLE_BUILDS is " + now.getValue());
+          System.out.println("NOW is " + format.format(now));
         }
       }
     ]]></echo>
@@ -62,7 +60,6 @@
       <arg value="86400"/>
     </java>
     <au:assertPropertyContains name="testout" value="NOW is 1970-01-02T00:00:00"/>
-    <au:assertPropertyContains name="testout" value="REPRODUCIBLE_BUILDS is false"/>
   </target>
 
   <target name="testGetNowMagicPropertyIso" depends="-createNowPrinter">
@@ -79,7 +76,6 @@
       <arg value="1972-04-17T08:07:00Z"/>
     </java>
     <au:assertPropertyContains name="testout" value="NOW is 1972-04-17T08:07:00"/>
-    <au:assertPropertyContains name="testout" value="REPRODUCIBLE_BUILDS is false"/>
   </target>
 
   <target name="testGetNowMagicPropertyBoth" depends="-createNowPrinter">
@@ -98,7 +94,6 @@
       <arg value="1972-04-17T08:07:00Z"/>
     </java>
     <au:assertPropertyContains name="testout" value="NOW is 1972-04-17T08:07:00"/>
-    <au:assertPropertyContains name="testout" value="REPRODUCIBLE_BUILDS is false"/>
   </target>
 
   <target name="testGetNowSourceDateEpoch" depends="-createNowPrinter">
@@ -118,7 +113,6 @@
       <env key="SOURCE_DATE_EPOCH" value="1650585600"/>
     </java>
     <au:assertPropertyContains name="testout" value="NOW is 2022-04-22T00:00:00"/>
-    <au:assertPropertyContains name="testout" value="REPRODUCIBLE_BUILDS is true"/>
   </target>
 
   <target name="testGetNowRealNow" depends="-createNowPrinter">
@@ -139,6 +133,5 @@
       </classpath>
     </java>
     <au:assertPropertyContains name="testout" value="NOW is ${dstamp}T"/>
-    <au:assertPropertyContains name="testout" value="REPRODUCIBLE_BUILDS is false"/>
   </target>
 </project>
