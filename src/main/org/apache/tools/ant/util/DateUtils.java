@@ -405,11 +405,12 @@ public final class DateUtils {
     public static final String ENV_SOURCE_DATE_EPOCH = "SOURCE_DATE_EPOCH";
 
     /**
-     * Consults the magic properties {@link MagicNames.TSTAMP_NOW_ISO} and {@link MagicNames.TSTAMP_NOW} as well as the
-     * environment variable {@code SOURCE_DATE_EPOCH} for predefined values of "now" and falls back to {@code new
-     * Date()} if neiter is set.
+     * Consults {@linkplain #ENV_SOURCE_DATE_EPOCH SOURCE_DATE_EPOCH} environment variable and
+     * the magic properties {@link MagicNames#TSTAMP_NOW_ISO} and {@link MagicNames#TSTAMP_NOW}
+     * for predefined values of "now" and falls back to {@code new Date()} if neither is set.
      *
-     * <p>{@code SOURCE_DATE_EPOCH} takes precendence over {@link MagicNames.TSTAMP_NOW_ISO} which in turn takes precendence over {@link MagicNames.TSTAMP_NOW}.</p>
+     * <p>{@code SOURCE_DATE_EPOCH} takes precedence over {@link MagicNames#TSTAMP_NOW_ISO} which
+     * in turn takes precedence over {@link MagicNames#TSTAMP_NOW}.</p>
      *
      * @param project Project instance to use when looking up the magic properties.
      * @return a tuple of "now" and a boolean flag that indicates whether {@code SOURCE_DATE_EPOCH} has been set.
