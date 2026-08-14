@@ -194,7 +194,7 @@ public class PropertyFile extends Task {
         } else {
             LayoutPreservingProperties p = new LayoutPreservingProperties();
             Calendar c = Calendar.getInstance();
-            c.setTime(getProject().getNow());
+            c.setTime(getProject().getBuildDate());
             TimeZone tz = System.getenv(DateUtils.ENV_SOURCE_DATE_EPOCH) != null
                 ? TimeZone.getTimeZone("UTC") : null;
             p.setDateComment(c, tz);

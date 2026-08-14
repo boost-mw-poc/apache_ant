@@ -22,11 +22,11 @@ Other changes:
    Based on a patch used by the Debian Ant package maintainers.
    Part of Bugzilla Report 61269
 
- * a new method getNow in Project can now be used to calculate a
-   notion of "now" that consults the SOURCE_DATE_EPOCH environment
+ * a new method getBuildDate in Project can now be used to calculate a
+   notion of a "uild date" that consults the SOURCE_DATE_EPOCH environment
    variable as well as the magic ant.tstamp.now and ant.tstamp.now.iso
    properties in this order which you can use if you want to obtain a
-   reproducible timestamp in task you write yourself.
+   reproducible timestamp in tasks you write yourself.
 
  * The "record" task now has a new "relativeToBaseDir" attribute,
    which can be set to "yes" or "no", to control where the

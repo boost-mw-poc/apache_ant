@@ -18,15 +18,15 @@
 <project default="antunit" name="project-test" xmlns:au="antlib:org.apache.ant.antunit">
   <import file="../antunit-base.xml" />
 
-  <target name="-createNowPrinter">
+  <target name="-createBuildDatePrinter">
     <mkdir dir="${input}"/>
     <mkdir dir="${output}"/>
-    <echo file="${input}/NowPrinter.java"><![CDATA[
+    <echo file="${input}/BuildDatePrinter.java"><![CDATA[
       import org.apache.tools.ant.BuildException;
       import org.apache.tools.ant.Project;
       import java.text.SimpleDateFormat;
       import java.util.*;
-      public class NowPrinter {
+      public class BuildDatePrinter {
         public static void main(String[] args) {
           Project p = new Project();
           int argsLen = args.length;
@@ -36,19 +36,19 @@
           for (int i = 0; i < argsLen; i += 2) {
             p.setProperty(args[i], args[i + 1]);
           }
-          Date now = p.getNow();
+          Date buildDate = p.getBuildDate();
           SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
           format.setTimeZone(TimeZone.getTimeZone("UTC"));
-          System.out.println("NOW is " + format.format(now));
+          System.out.println("BUILDDATE is " + format.format(buildDate));
         }
       }
     ]]></echo>
     <javac srcdir="${input}" destdir="${output}"/>
   </target>
 
-  <target name="testGetNowMagicProperty" depends="-createNowPrinter">
+  <target name="testGetBuildDateMagicProperty" depends="-createBuildDatePrinter">
     <local name="testout"/>
-    <java classname="NowPrinter"
+    <java classname="BuildDatePrinter"
           failonerror="true"
           outputproperty="testout"
           fork="true">
@@ -59,12 +59,12 @@
       <arg value="ant.tstamp.now"/>
       <arg value="86400"/>
     </java>
-    <au:assertPropertyContains name="testout" value="NOW is 1970-01-02T00:00:00"/>
+    <au:assertPropertyContains name="testout" value="BUILDDATE is 1970-01-02T00:00:00"/>
   </target>
 
-  <target name="testGetNowMagicPropertyIso" depends="-createNowPrinter">
+  <target name="testGetBuildDateMagicPropertyIso" depends="-createBuildDatePrinter">
     <local name="testout"/>
-    <java classname="NowPrinter"
+    <java classname="BuildDatePrinter"
           failonerror="true"
           outputproperty="testout"
           fork="true">
@@ -75,12 +75,12 @@
       <arg value="ant.tstamp.now.iso"/>
       <arg value="1972-04-17T08:07:00Z"/>
     </java>
-    <au:assertPropertyContains name="testout" value="NOW is 1972-04-17T08:07:00"/>
+    <au:assertPropertyContains name="testout" value="BUILDDATE is 1972-04-17T08:07:00"/>
   </target>
 
-  <target name="testGetNowMagicPropertyBoth" depends="-createNowPrinter">
+  <target name="testGetBuildDateMagicPropertyBoth" depends="-createBuildDatePrinter">
     <local name="testout"/>
-    <java classname="NowPrinter"
+    <java classname="BuildDatePrinter"
           failonerror="true"
           outputproperty="testout"
           fork="true">
@@ -93,12 +93,12 @@
       <arg value="ant.tstamp.now.iso"/>
       <arg value="1972-04-17T08:07:00Z"/>
     </java>
-    <au:assertPropertyContains name="testout" value="NOW is 1972-04-17T08:07:00"/>
+    <au:assertPropertyContains name="testout" value="BUILDDATE is 1972-04-17T08:07:00"/>
   </target>
 
-  <target name="testGetNowSourceDateEpoch" depends="-createNowPrinter">
+  <target name="testGetBuildDateSourceDateEpoch" depends="-createBuildDatePrinter">
     <local name="testout"/>
-    <java classname="NowPrinter"
+    <java classname="BuildDatePrinter"
           failonerror="true"
           outputproperty="testout"
           fork="true">
@@ -112,18 +112,18 @@
       <arg value="1972-04-17T08:07:00Z"/>
       <env key="SOURCE_DATE_EPOCH" value="1650585600"/>
     </java>
-    <au:assertPropertyContains name="testout" value="NOW is 2022-04-22T00:00:00"/>
+    <au:assertPropertyContains name="testout" value="BUILDDATE is 2022-04-22T00:00:00"/>
   </target>
 
-  <target name="testGetNowRealNow" depends="-createNowPrinter">
+  <target name="testGetBuildDateRealNow" depends="-createBuildDatePrinter">
     <local name="dstamp"/>
     <local name="testout"/>
     <!-- ignoring the time part and hoping the clock doesn't pass
-         midnight between running tstamp and NowPrinter -->
+         midnight between running tstamp and BuildDatePrinter -->
     <tstamp>
       <format pattern="yyyy-MM-dd" property="dstamp" timezone="UTC"/>
     </tstamp>
-    <java classname="NowPrinter"
+    <java classname="BuildDatePrinter"
           failonerror="true"
           outputproperty="testout"
           fork="true">
@@ -132,6 +132,6 @@
         <pathelement path="${java.class.path}"/>
       </classpath>
     </java>
-    <au:assertPropertyContains name="testout" value="NOW is ${dstamp}T"/>
+    <au:assertPropertyContains name="testout" value="BUILDDATE is ${dstamp}T"/>
   </target>
 </project>

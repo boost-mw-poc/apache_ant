@@ -2493,15 +2493,15 @@ public class Project implements ResourceFactory {
     /**
      * Consults {@linkplain #ENV_SOURCE_DATE_EPOCH SOURCE_DATE_EPOCH} environment variable and
      * the magic properties {@link MagicNames#TSTAMP_NOW_ISO} and {@link MagicNames#TSTAMP_NOW}
-     * for predefined values of "now" and falls back to {@code new Date()} if neither is set.
+     * for predefined values of the build date and falls back to {@code new Date()} if neither is set.
      *
      * <p>{@code SOURCE_DATE_EPOCH} takes precedence over {@link MagicNames#TSTAMP_NOW_ISO} which
      * in turn takes precedence over {@link MagicNames#TSTAMP_NOW}.</p>
      *
-     * @return "now" as explained above
+     * @return "build date" as explained above
      * @since Ant 1.10.18
      */
-    public Date getNow() {
+    public Date getBuildDate() {
         final String epoch = System.getenv(DateUtils.ENV_SOURCE_DATE_EPOCH);
         if (epoch != null) {
             // Value of SOURCE_DATE_EPOCH will be an integer, representing seconds.
