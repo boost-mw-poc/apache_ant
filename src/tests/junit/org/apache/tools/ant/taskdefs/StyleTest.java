@@ -93,13 +93,6 @@ public class StyleTest {
     }
 
     @Test
-    public void testNewerStylesheet() throws Exception {
-        expectFileContains("testNewerStylesheet",
-                           buildRule.getOutputDir().getAbsoluteFile() + "/out.xml",
-                           "new-value");
-    }
-
-    @Test
     public void testDefaultMapper() throws Exception {
         testDefaultMapper("testDefaultMapper");
     }

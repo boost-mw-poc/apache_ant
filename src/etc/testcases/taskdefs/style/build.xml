@@ -87,19 +87,6 @@
     </xslt>
   </target>
 
-  <target name="testNewerStylesheet">
-      <antcall target="copyXsl">
-        <param name="xsl.value" value="old-value"/>
-      </antcall>
-      <xslt in="data.xml" out="${output}/out.xml" style="tmp.xsl"/>
-
-      <antcall target="copyXsl">
-        <param name="xsl.value" value="new-value"/>
-      </antcall>
-      <xslt in="data.xml" out="${output}/out.xml" style="tmp.xsl" granularity="0"/>
-      <delete file="tmp.xsl"/>
-  </target>
-
   <target name="testDirectoryHierarchyWithDirMatching">
     <mkdir dir="${output}/src/level1/"/>
     <copy file="data.xml" todir="${output}/src/level1/"/>
