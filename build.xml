@@ -2241,6 +2241,7 @@ ${antunit.reports}
   -->
   <target name="-init-cyclonedx"
           depends="check-optional-packages"
+          xmlns:cdx="antlib:org.apache.ant.cyclonedx"
           if="cyclonedx.antlib.present">
     <typedef uri="antlib:org.apache.ant.cyclonedx"
       resource="org/apache/ant/cyclonedx/antlib.xml">
@@ -2249,19 +2250,15 @@ ${antunit.reports}
 
     <cdx:organization
         name="Apache Ant Project Management Committee"
-        id="ant-pmc"
-        xmlns:cdx="antlib:org.apache.ant.cyclonedx">
+        id="ant-pmc">
       <url url="https://ant.apache.org/"/>
     </cdx:organization>
     <cdx:license
         licenseId="Apache-2.0"
-        id="apache-2"
-        xmlns:cdx="antlib:org.apache.ant.cyclonedx">
+        id="apache-2">
       <url url="https://www.apache.org/licenses/LICENSE-2.0.txt"/>
     </cdx:license>
-    <cdx:externalreferenceset
-        id="ant-common-refs"
-        xmlns:cdx="antlib:org.apache.ant.cyclonedx">
+    <cdx:externalreferenceset id="ant-common-refs">
       <externalReference
           type="VCS"
           url="https://gitbox.apache.org/repos/asf/ant.git"/>
@@ -2301,7 +2298,9 @@ ${antunit.reports}
     </cdx:externalreferenceset>
   </target>
 
-  <target name="component-boms" depends="-init-cyclonedx,jars,test-jar"
+  <target name="component-boms"
+          depends="-init-cyclonedx,jars,test-jar"
+          xmlns:cdx="antlib:org.apache.ant.cyclonedx"
           if="cyclonedx.antlib.present">
 
     <property file="${lib.dir}/libraries.properties"/>
@@ -2317,8 +2316,7 @@ ${antunit.reports}
             outputdirectory="${build.lib}"
             format="all"
             useComponentSupplier="true"
-            useComponentManufacturer="true"
-            xmlns:cdx="antlib:org.apache.ant.cyclonedx">
+            useComponentManufacturer="true">
           <component
               id="cdx-ant@{suffix}"
               name="ant@{suffix}"
@@ -2381,8 +2379,7 @@ ${antunit.reports}
         group="xml-resolver"
         version="${xml-resolver.version}"
         description="xml-commons provides an Apache-hosted set of DOM, SAX, and JAXP interfaces for use in other xml-based projects. Our hope is that we can standardize on both a common version and packaging scheme for these critical XML standards interfaces to make the lives of both our developers and users easier."
-        publisher="The Apache Software Foundation"
-        xmlns:cdx="antlib:org.apache.ant.cyclonedx">
+        publisher="The Apache Software Foundation">
       <license refid="apache-2"/>
       <externalReference
           type="WEBSITE"
@@ -2396,8 +2393,7 @@ ${antunit.reports}
         group="junit"
         version="${junit.version}"
         description="JUnit is a unit testing framework for Java, created by Erich Gamma and Kent Beck."
-        publisher="JUnit"
-        xmlns:cdx="antlib:org.apache.ant.cyclonedx">
+        publisher="JUnit">
       <license licenseId="EPL-1.0">
         <url url="http://www.eclipse.org/legal/epl-v10.html"/>
       </license>
@@ -2411,8 +2407,7 @@ ${antunit.reports}
         name="hamcrest"
         group="org.hamcrest"
         version="${hamcrest.version}"
-        description="Core API and libraries of hamcrest matcher framework."
-        xmlns:cdx="antlib:org.apache.ant.cyclonedx">
+        description="Core API and libraries of hamcrest matcher framework.">
       <license licenseId="BSD-3-Clause">
         <url url="https://raw.githubusercontent.com/hamcrest/JavaHamcrest/master/LICENSE"/>
       </license>
@@ -2426,8 +2421,7 @@ ${antunit.reports}
 
     <cdx:component
         id="cdx-junit4"
-        refid="cdx-junit"
-        xmlns:cdx="antlib:org.apache.ant.cyclonedx"/>
+        refid="cdx-junit"/>
     <optional-sbom dep="junit4" nameSuffix="+ JUnit 4">
       <additionalComponent refid="cdx-hamcrest"/>
     </optional-sbom>
@@ -2438,8 +2432,7 @@ ${antunit.reports}
         group="org.junit.platform"
         version="${junit-platform-launcher.version}"
         description='Module "junit-platform-launcher" of JUnit 5.'
-        unknownDependencies="true"
-        xmlns:cdx="antlib:org.apache.ant.cyclonedx">
+        unknownDependencies="true">
       <license licenseId="EPL-2.0">
         <url url="https://www.eclipse.org/legal/epl-v20.html"/>
       </license>
@@ -2454,8 +2447,7 @@ ${antunit.reports}
         name="jakarta-regexp"
         group="jakarta-regexp"
         version="${jakarta-regexp.version}"
-        unknownDependencies="true"
-        xmlns:cdx="antlib:org.apache.ant.cyclonedx">
+        unknownDependencies="true">
       <license refid="apache-2"/>
     </cdx:component>
     <optional-sbom dep="apache-regexp" nameSuffix="+ Apache Regexp"/>
@@ -2465,19 +2457,16 @@ ${antunit.reports}
         name="oro"
         group="oro"
         version="${oro.version}"
-        unknownDependencies="true"
-        xmlns:cdx="antlib:org.apache.ant.cyclonedx">
+        unknownDependencies="true">
       <license refid="apache-2"/>
     </cdx:component>
     <optional-sbom dep="apache-oro" nameSuffix="+ Apache Oro"/>
 
-    <cdx:component
-        id="cdx-apache-bcel"
-        xmlns:cdx="antlib:org.apache.ant.cyclonedx">
-      <sbomLink>
+    <cdx:component id="cdx-apache-bcel">
+      <cdx:sbomLink>
         <url
             url="https://repo1.maven.org/maven2/org/apache/bcel/bcel/${bcel.version}/bcel-${bcel.version}-cyclonedx.json"/>
-      </sbomLink>
+      </cdx:sbomLink>
     </cdx:component>
     <optional-sbom dep="apache-bcel" nameSuffix="+ BCEL"/>
 
@@ -2485,8 +2474,7 @@ ${antunit.reports}
         id="cdx-apache-log4j"
         name="log4j"
         group="log4j"
-        version="${log4j.version}"
-        xmlns:cdx="antlib:org.apache.ant.cyclonedx">
+        version="${log4j.version}">
       <license refid="apache-2"/>
     </cdx:component>
     <optional-sbom dep="apache-log4j" nameSuffix="+ Log4J 1.x"/>
@@ -2496,8 +2484,7 @@ ${antunit.reports}
         name="commons-logging-api"
         group="commons-logging"
         version="${commons-logging-api.version}"
-        description="Commons Logging is a thin adapter allowing configurable bridging to other, well known logging systems."
-        xmlns:cdx="antlib:org.apache.ant.cyclonedx">
+        description="Commons Logging is a thin adapter allowing configurable bridging to other, well known logging systems.">
       <license refid="apache-2"/>
     </cdx:component>
     <optional-sbom dep="commons-logging" nameSuffix="+ Commons Logging"/>
@@ -2507,8 +2494,7 @@ ${antunit.reports}
         name="bsf"
         group="bsf"
         version="${bsf.version}"
-        unknownDependencies="true"
-        xmlns:cdx="antlib:org.apache.ant.cyclonedx">
+        unknownDependencies="true">
       <license refid="apache-2"/>
     </cdx:component>
     <optional-sbom dep="apache-bsf" nameSuffix="+ BSF"/>
@@ -2518,8 +2504,7 @@ ${antunit.reports}
         name="javax.mail"
         group="com.sun.mail"
         version="${javax.mail.version}"
-        unknownDependencies="true"
-        xmlns:cdx="antlib:org.apache.ant.cyclonedx"/>
+        unknownDependencies="true"/>
     <optional-sbom dep="javamail" nameSuffix="+ JavaMail"/>
 
     <cdx:component
@@ -2527,8 +2512,7 @@ ${antunit.reports}
         name="jakarta.mail"
         group="com.sun.mail"
         version="${jakarta.mail.version}"
-        unknownDependencies="true"
-        xmlns:cdx="antlib:org.apache.ant.cyclonedx"/>
+        unknownDependencies="true"/>
     <optional-sbom dep="jakartamail" nameSuffix="+ JakartaMail"/>
 
     <cdx:component
@@ -2536,8 +2520,7 @@ ${antunit.reports}
         bomRef="https://www.netrexx.org/files/NetRexxC-${netrexx.version}.jar"
         name="netrexx"
         version="${netrexx.version}"
-        unknownDependencies="true"
-        xmlns:cdx="antlib:org.apache.ant.cyclonedx">
+        unknownDependencies="true">
       <license licenseId="ICU">
         <url url="https://github.com/RexxLA/NetRexx/blob/master/LICENSE"/>
       </license>
@@ -2550,13 +2533,11 @@ ${antunit.reports}
     </cdx:component>
     <optional-sbom dep="netrexx" nameSuffix="+ NetRexx"/>
 
-    <cdx:component
-        id="cdx-commons-net"
-        xmlns:cdx="antlib:org.apache.ant.cyclonedx">
-      <sbomLink>
+    <cdx:component id="cdx-commons-net">
+      <cdx:sbomLink>
         <url
             url="https://repo1.maven.org/maven2/commons-net/commons-net/${commons-net.version}/commons-net-${commons-net.version}-cyclonedx.json"/>
-      </sbomLink>
+      </cdx:sbomLink>
     </cdx:component>
     <optional-sbom dep="commons-net" nameSuffix="+ Commons Net"/>
 
@@ -2565,8 +2546,7 @@ ${antunit.reports}
         name="antlr"
         group="antlr"
         version="${antlr.version}"
-        description="A framework for constructing recognizers, compilers, and translators from grammatical descriptions containing Java, C#, C++, or Python actions."
-        xmlns:cdx="antlib:org.apache.ant.cyclonedx">
+        description="A framework for constructing recognizers, compilers, and translators from grammatical descriptions containing Java, C#, C++, or Python actions.">
       <license name="BSD License">
         <url url="http://www.antlr.org/license.html"/>
       </license>
@@ -2608,8 +2588,7 @@ ${antunit.reports}
         group="javax.media"
         description="The Java Advanced Imaging API extends the Java 2 platform by allowing sophisticated, high-performance image processing to be incorporated into Java applets and applications. It is a set of classes providing imaging functionality beyond that of Java 2D and the Java Foundation classes, though it is designed for compatibility with those APIs. This API implements a set of core image processing capabilities including image tiling, regions of interest, deferred execution and a set of core image processing operators, including many common point, area, and frequency domain operators."
         version="${jai-core.version}"
-        unknownDependencies="true"
-        xmlns:cdx="antlib:org.apache.ant.cyclonedx">
+        unknownDependencies="true">
       <license name="Sun Microsystems, Inc. Binary Code License Agreement"/>
     </cdx:component>
     <optional-sbom dep="jai" nameSuffix="+ JAI"/>
@@ -2632,8 +2611,7 @@ ${antunit.reports}
         name="jsch"
         group="com.jcraft"
         description="JSch is a pure Java implementation of SSH2"
-        version="${jsch.version}"
-        xmlns:cdx="antlib:org.apache.ant.cyclonedx">
+        version="${jsch.version}">
       <externalReference
           type="WEBSITE"
           url="http://www.jcraft.com/"/>
@@ -2648,16 +2626,14 @@ ${antunit.reports}
         name="jdepend"
         group="jdepend"
         version="${jdepend.version}"
-        unknownDependencies="true"
-        xmlns:cdx="antlib:org.apache.ant.cyclonedx"/>
+        unknownDependencies="true"/>
     <optional-sbom dep="jdepend" nameSuffix="+ JDepend"/>
 
     <cdx:component
         id="cdx-apache-xalan2"
         name="xalan"
         group="xalan"
-        version="${xalan.version}"
-        xmlns:cdx="antlib:org.apache.ant.cyclonedx">
+        version="${xalan.version}">
       <license refid="apache-2"/>
     </cdx:component>
     <optional-sbom dep="apache-xalan2" nameSuffix="+ Xalan 2"/>
@@ -2667,8 +2643,7 @@ ${antunit.reports}
         name="xz"
         group="org.tukaani"
         version="${xz.version}"
-        description="XZ data compression"
-        xmlns:cdx="antlib:org.apache.ant.cyclonedx">
+        description="XZ data compression">
       <externalReference
           type="WEBSITE"
           url="https://tukaani.org/xz/java.html"/>
@@ -2695,6 +2670,7 @@ ${antunit.reports}
 
   <target name="-prepare-distribution-bom"
           depends="-init-cyclonedx"
+          xmlns:cdx="antlib:org.apache.ant.cyclonedx"
           if="cyclonedx.antlib.present">
     <macrodef name="ant-distributionbom">
       <attribute name="distdir"/>
@@ -2711,8 +2687,7 @@ ${antunit.reports}
             outputdirectory="@{distdir}"
             format="all"
             useComponentSupplier="true"
-            useComponentManufacturer="true"
-            xmlns:cdx="antlib:org.apache.ant.cyclonedx">
+            useComponentManufacturer="true">
           <component
               name="https://archive.apache.org/dist/ant/@{subdir}/${dist.name}-@{kind}.@{ext}"
               purl="https://archive.apache.org/dist/ant/@{subdir}/${dist.name}-@{kind}.@{ext}"
@@ -2805,6 +2780,7 @@ ${antunit.reports}
 
   <target name="-tar-distribution-sboms"
           depends="-prepare-distribution-bom,component-boms,zip-distribution,tar-distribution"
+          xmlns:cdx="antlib:org.apache.ant.cyclonedx"
           if="cyclonedx.antlib.present">
     <create-tarball-boms
         distdir="${dist.base.binaries}"
@@ -2814,207 +2790,207 @@ ${antunit.reports}
         descriptionsuffix="Binary Distribution">
       <componentChildren>
         <component>
-          <sbomLink>
+          <cdx:sbomLink>
             <file file="${build.lib}/ant-launcher.cdx.json"/>
-          </sbomLink>
+          </cdx:sbomLink>
           <file file="${build.lib}/ant-launcher.jar"/>
         </component>
         <dependency componentRef="cdx-ant-launcher"/>
         <component>
-          <sbomLink>
+          <cdx:sbomLink>
             <file file="${build.lib}/ant.cdx.json"/>
-          </sbomLink>
+          </cdx:sbomLink>
           <file file="${build.lib}/ant.jar"/>
         </component>
         <dependency componentRef="cdx-ant"/>
         <component scope="optional" if:set="antlr.present" xmlns:if="ant:if">
-          <sbomLink>
+          <cdx:sbomLink>
             <file file="${build.lib}/ant-antlr.cdx.json"/>
-          </sbomLink>
+          </cdx:sbomLink>
           <file file="${build.lib}/ant-antlr.jar"/>
         </component>
         <dependency componentRef="cdx-ant-antlr"
                     if:set="antlr.present" xmlns:if="ant:if"/>
         <component scope="optional" if:set="apache-bcel.present" xmlns:if="ant:if">
-          <sbomLink>
+          <cdx:sbomLink>
             <file file="${build.lib}/ant-apache-bcel.cdx.json"/>
-          </sbomLink>
+          </cdx:sbomLink>
           <file file="${build.lib}/ant-apache-bcel.jar"/>
         </component>
         <dependency componentRef="cdx-ant-apache-bcel"
                     if:set="apache-bcel.present" xmlns:if="ant:if"/>
         <component scope="optional" if:set="apache-bcel.present" xmlns:if="ant:if">
-          <sbomLink>
+          <cdx:sbomLink>
             <file file="${build.lib}/ant-apache-bsf.cdx.json"/>
-          </sbomLink>
+          </cdx:sbomLink>
           <file file="${build.lib}/ant-apache-bsf.jar"/>
         </component>
         <dependency componentRef="cdx-ant-apache-bsf"
                     if:set="apache-bcel.present" xmlns:if="ant:if"/>
         <component scope="optional" if:set="apache-log4j.present" xmlns:if="ant:if">
-          <sbomLink>
+          <cdx:sbomLink>
             <file file="${build.lib}/ant-apache-log4j.cdx.json"/>
-          </sbomLink>
+          </cdx:sbomLink>
           <file file="${build.lib}/ant-apache-log4j.jar"/>
         </component>
         <dependency componentRef="cdx-ant-apache-log4j"
                     if:set="apache-log4j.present" xmlns:if="ant:if"/>
         <component scope="optional" if:set="apache-oro.present" xmlns:if="ant:if">
-          <sbomLink>
+          <cdx:sbomLink>
             <file file="${build.lib}/ant-apache-oro.cdx.json"/>
-          </sbomLink>
+          </cdx:sbomLink>
           <file file="${build.lib}/ant-apache-oro.jar"/>
         </component>
         <dependency componentRef="cdx-ant-apache-oro"
                     if:set="apache-oro.present" xmlns:if="ant:if"/>
         <component scope="optional" if:set="apache-regexp.present" xmlns:if="ant:if">
-          <sbomLink>
+          <cdx:sbomLink>
             <file file="${build.lib}/ant-apache-regexp.cdx.json"/>
-          </sbomLink>
+          </cdx:sbomLink>
           <file file="${build.lib}/ant-apache-regexp.jar"/>
         </component>
         <dependency componentRef="cdx-ant-apache-regexp"
                     if:set="apache-regexp.present" xmlns:if="ant:if"/>
         <component scope="optional" if:set="apache-resolver.present" xmlns:if="ant:if">
-          <sbomLink>
+          <cdx:sbomLink>
             <file file="${build.lib}/ant-apache-resolver.cdx.json"/>
-          </sbomLink>
+          </cdx:sbomLink>
           <file file="${build.lib}/ant-apache-resolver.jar"/>
         </component>
         <dependency componentRef="cdx-ant-apache-resolver"
                     if:set="apache-resolver.present" xmlns:if="ant:if"/>
         <component scope="optional" if:set="apache-xalan2.present" xmlns:if="ant:if">
-          <sbomLink>
+          <cdx:sbomLink>
             <file file="${build.lib}/ant-apache-xalan2.cdx.json"/>
-          </sbomLink>
+          </cdx:sbomLink>
           <file file="${build.lib}/ant-apache-xalan2.jar"/>
         </component>
         <dependency componentRef="cdx-ant-apache-xalan2"
                     if:set="apache-xalan2.present" xmlns:if="ant:if"/>
         <component scope="optional" if:set="commons-logging.present" xmlns:if="ant:if">
-          <sbomLink>
+          <cdx:sbomLink>
             <file file="${build.lib}/ant-commons-logging.cdx.json"/>
-          </sbomLink>
+          </cdx:sbomLink>
           <file file="${build.lib}/ant-commons-logging.jar"/>
         </component>
         <dependency componentRef="cdx-ant-commons-logging"
                     if:set="commons-logging.present" xmlns:if="ant:if"/>
         <component scope="optional" if:set="commons-net.present" xmlns:if="ant:if">
-          <sbomLink>
+          <cdx:sbomLink>
             <file file="${build.lib}/ant-commons-net.cdx.json"/>
-          </sbomLink>
+          </cdx:sbomLink>
           <file file="${build.lib}/ant-commons-net.jar"/>
         </component>
         <dependency componentRef="cdx-ant-commons-net"
                     if:set="commons-net.present" xmlns:if="ant:if"/>
         <component scope="optional" if:set="imageio.present" xmlns:if="ant:if">
-          <sbomLink>
+          <cdx:sbomLink>
             <file file="${build.lib}/ant-imageio.cdx.json"/>
-          </sbomLink>
+          </cdx:sbomLink>
           <file file="${build.lib}/ant-imageio.jar"/>
         </component>
         <dependency componentRef="cdx-ant-imageio"
                     if:set="imageio.present" xmlns:if="ant:if"/>
         <component scope="optional" if:set="jai.present" xmlns:if="ant:if">
-          <sbomLink>
+          <cdx:sbomLink>
             <file file="${build.lib}/ant-jai.cdx.json"/>
-          </sbomLink>
+          </cdx:sbomLink>
           <file file="${build.lib}/ant-jai.jar"/>
         </component>
         <dependency componentRef="cdx-ant-jai"
                     if:set="jai.present" xmlns:if="ant:if"/>
         <component scope="optional" if:set="jakartamail.present" xmlns:if="ant:if">
-          <sbomLink>
+          <cdx:sbomLink>
             <file file="${build.lib}/ant-jakartamail.cdx.json"/>
-          </sbomLink>
+          </cdx:sbomLink>
           <file file="${build.lib}/ant-jakartamail.jar"/>
         </component>
         <dependency componentRef="cdx-ant-jakartamail"
                     if:set="jakartamail.present" xmlns:if="ant:if"/>
         <component scope="optional" if:set="javamail.present" xmlns:if="ant:if">
-          <sbomLink>
+          <cdx:sbomLink>
             <file file="${build.lib}/ant-javamail.cdx.json"/>
-          </sbomLink>
+          </cdx:sbomLink>
           <file file="${build.lib}/ant-javamail.jar"/>
         </component>
         <dependency componentRef="cdx-ant-javamail"
                     if:set="javamail.present" xmlns:if="ant:if"/>
         <component scope="optional" if:set="jdepend.present" xmlns:if="ant:if">
-          <sbomLink>
+          <cdx:sbomLink>
             <file file="${build.lib}/ant-jdepend.cdx.json"/>
-          </sbomLink>
+          </cdx:sbomLink>
           <file file="${build.lib}/ant-jdepend.jar"/>
         </component>
         <dependency componentRef="cdx-ant-jdepend"
                     if:set="jdepend.present" xmlns:if="ant:if"/>
         <component scope="optional" if:set="jmf.present" xmlns:if="ant:if">
-          <sbomLink>
+          <cdx:sbomLink>
             <file file="${build.lib}/ant-jmf.cdx.json"/>
-          </sbomLink>
+          </cdx:sbomLink>
           <file file="${build.lib}/ant-jmf.jar"/>
         </component>
         <dependency componentRef="cdx-ant-jmf"
                     if:set="jmf.present" xmlns:if="ant:if"/>
         <component scope="optional" if:set="jsch.present" xmlns:if="ant:if">
-          <sbomLink>
+          <cdx:sbomLink>
             <file file="${build.lib}/ant-jsch.cdx.json"/>
-          </sbomLink>
+          </cdx:sbomLink>
           <file file="${build.lib}/ant-jsch.jar"/>
         </component>
         <dependency componentRef="cdx-ant-jsch"
                     if:set="jsch.present" xmlns:if="ant:if"/>
         <component scope="optional" if:set="junit4.present" xmlns:if="ant:if">
-          <sbomLink>
+          <cdx:sbomLink>
             <file file="${build.lib}/ant-junit4.cdx.json"/>
-          </sbomLink>
+          </cdx:sbomLink>
           <file file="${build.lib}/ant-junit4.jar"/>
         </component>
         <dependency componentRef="cdx-ant-junit4"
                     if:set="junit4.present" xmlns:if="ant:if"/>
         <component scope="optional" if:set="junit.present" xmlns:if="ant:if">
-          <sbomLink>
+          <cdx:sbomLink>
             <file file="${build.lib}/ant-junit.cdx.json"/>
-          </sbomLink>
+          </cdx:sbomLink>
           <file file="${build.lib}/ant-junit.jar"/>
         </component>
         <dependency componentRef="cdx-ant-junit"
                     if:set="junit.present" xmlns:if="ant:if"/>
         <component scope="optional" if:set="junitlauncher.present" xmlns:if="ant:if">
-          <sbomLink>
+          <cdx:sbomLink>
             <file file="${build.lib}/ant-junitlauncher.cdx.json"/>
-          </sbomLink>
+          </cdx:sbomLink>
           <file file="${build.lib}/ant-junitlauncher.jar"/>
         </component>
         <dependency componentRef="cdx-ant-junitlauncher"
                     if:set="junitlauncher.present" xmlns:if="ant:if"/>
         <component scope="optional" if:set="netrexx.present" xmlns:if="ant:if">
-          <sbomLink>
+          <cdx:sbomLink>
             <file file="${build.lib}/ant-netrexx.cdx.json"/>
-          </sbomLink>
+          </cdx:sbomLink>
           <file file="${build.lib}/ant-netrexx.jar"/>
         </component>
         <dependency componentRef="cdx-ant-netrexx"
                     if:set="netrexx.present" xmlns:if="ant:if"/>
         <component scope="optional" if:set="swing.present" xmlns:if="ant:if">
-          <sbomLink>
+          <cdx:sbomLink>
             <file file="${build.lib}/ant-swing.cdx.json"/>
-          </sbomLink>
+          </cdx:sbomLink>
           <file file="${build.lib}/ant-swing.jar"/>
         </component>
         <dependency componentRef="cdx-ant-swing"
                     if:set="swing.present" xmlns:if="ant:if"/>
         <component scope="optional" if:set="xz.present" xmlns:if="ant:if">
-          <sbomLink>
+          <cdx:sbomLink>
             <file file="${build.lib}/ant-xz.cdx.json"/>
-          </sbomLink>
+          </cdx:sbomLink>
           <file file="${build.lib}/ant-xz.jar"/>
         </component>
         <dependency componentRef="cdx-ant-xz"
                     if:set="xz.present" xmlns:if="ant:if"/>
         <component scope="optional" if:set="junit4.present" xmlns:if="ant:if">
-          <sbomLink>
+          <cdx:sbomLink>
             <file file="${build.lib}/ant-testutil.cdx.json"/>
-          </sbomLink>
+          </cdx:sbomLink>
           <file file="${build.lib}/ant-testutil.jar"/>
         </component>
       </componentChildren>
