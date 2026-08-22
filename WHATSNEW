@@ -54,6 +54,10 @@ Fixed bugs:
    fixed.
    Bugzilla Report 70158
 
+ * <mappedresources> with "enableMultipleMappings" set to "true" threw
+   a NullPointerException if the mapper didn't apply to one of the
+   resources. Unmapped resources are now omitted from the collection.
+
 Changes from Ant 1.10.16 TO Ant 1.10.17
 =======================================
 
