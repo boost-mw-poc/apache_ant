@@ -36,6 +36,7 @@ import com.jcraft.jsch.SftpProgressMonitor;
 public class ScpFromMessageBySftp extends ScpFromMessage {
 
     private static final int HUNDRED_KILOBYTES = 102400;
+    private static final FileUtils FILE_UTILS = FileUtils.getFileUtils();
 
     private String remoteFile;
     private final File localFile;
@@ -101,6 +102,33 @@ public class ScpFromMessageBySftp extends ScpFromMessage {
     }
 
     /**
+     * Constructor for ScpFromMessageBySftp.
+     * @param verbose if true log extra information
+     * @param session the Scp session to use
+     * @param aRemoteFile the remote file name
+     * @param aLocalFile  the local file
+     * @param recursive   if true use recursion
+     * @param preserveLastModified whether to preserve file
+     * modification times
+     * @param allowFilesToEscapeDest if true files and directories retrieved may be places outside of the aLocalFile directory.
+     * @since Ant 1.10.18
+     */
+    public ScpFromMessageBySftp(final boolean verbose,
+                                final Session session,
+                                final String aRemoteFile,
+                                final File aLocalFile,
+                                final boolean recursive,
+                                final boolean preserveLastModified,
+                                final boolean allowFilesToEscapeDest) {
+        super(verbose, session, aRemoteFile, aLocalFile, recursive,
+              preserveLastModified, false, allowFilesToEscapeDest);
+        this.verbose = verbose;
+        this.remoteFile = aRemoteFile;
+        this.localFile = aLocalFile;
+        this.isRecursive = recursive;
+    }
+
+    /**
      * Carry out the transfer.
      * @throws IOException on i/o errors
      * @throws JSchException on errors detected by scp
@@ -132,7 +160,7 @@ public class ScpFromMessageBySftp extends ScpFromMessage {
 
     private void getDir(final ChannelSftp channel,
                         final String remoteFile,
-                        final File localFile) throws SftpException {
+                        final File localFile) throws SftpException, IOException {
         String pwd = remoteFile;
         final int lastIndexOfFileSeparator = remoteFile.lastIndexOf('/');
         if (lastIndexOfFileSeparator != -1) {
@@ -158,9 +186,16 @@ public class ScpFromMessageBySftp extends ScpFromMessage {
                 if (".".equals(name) || "..".equals(name)) {
                     continue;
                 }
-                getDir(channel,
-                       channel.pwd() + "/" + name + "/",
-                       new File(localFile, le.getFilename()));
+
+                File newDir = FILE_UTILS.resolveFile(localFile, name);
+                if (FILE_UTILS.isLeadingPath(this.localFile, newDir) || getAllowFilesToEscapeDest()) {
+                    getDir(channel,
+                           channel.pwd() + "/" + name + "/",
+                           newDir);
+                } else {
+                    log("Skipping: " + name + " as target " + FILE_UTILS.getResolvedPath(newDir)
+                        + " is outside " +  FILE_UTILS.getResolvedPath(this.localFile));
+                }
             } else {
                 getFile(channel, le, localFile);
             }
@@ -170,7 +205,7 @@ public class ScpFromMessageBySftp extends ScpFromMessage {
 
     private void getFile(final ChannelSftp channel,
                          final ChannelSftp.LsEntry le,
-                         File localFile) throws SftpException {
+                         File localFile) throws SftpException, IOException {
         final String remoteFile = le.getFilename();
         if (!localFile.exists()) {
             final String path = localFile.getAbsolutePath();
@@ -184,6 +219,11 @@ public class ScpFromMessageBySftp extends ScpFromMessage {
 
         if (localFile.isDirectory()) {
             localFile = new File(localFile, remoteFile);
+            if (!FILE_UTILS.isLeadingPath(this.localFile, localFile) && !getAllowFilesToEscapeDest()) {
+                log("Skipping: " + remoteFile + " as target " + FILE_UTILS.getResolvedPath(localFile)
+                    + " is outside " +  FILE_UTILS.getResolvedPath(this.localFile));
+                return;
+            }
         }
 
         final long startTime = System.currentTimeMillis();
@@ -202,7 +242,7 @@ public class ScpFromMessageBySftp extends ScpFromMessage {
             logStats(startTime, endTime, (int) totalLength);
         }
         if (getPreserveLastModified()) {
-            FileUtils.getFileUtils().setFileLastModified(localFile,
+            FILE_UTILS.setFileLastModified(localFile,
                     ((long) le.getAttrs().getMTime()) * 1000);
         }
     }
