@@ -153,7 +153,7 @@ public class FTP extends Task implements FTPTaskConfig {
     private int dataTimeout = -1;
     private int wakeUpTransferInterval = -1;
     private long lastWakeUpTime = 0;
-
+    private boolean allowFilesToEscapeDest = false;
 
     protected static final String[] ACTION_STRS = {//NOSONAR
         "sending",
@@ -1643,6 +1643,16 @@ public class FTP extends Task implements FTPTaskConfig {
     }
 
     /**
+     * Whether to allow the retrieved files or directories to be outside of the dest directory.
+     *
+     * @param b the flag
+     * @since Ant 1.10.18
+     */
+    public void setAllowFilesToEscapeDest(boolean b) {
+        allowFilesToEscapeDest = b;
+    }
+
+    /**
      * @return Returns the systemTypeKey.
      */
     @Override
@@ -2344,7 +2354,14 @@ public class FTP extends Task implements FTPTaskConfig {
      */
     protected void getFile(FTPClient ftp, String dir, String filename)
         throws IOException, BuildException {
-        File file = getProject().resolveFile(new File(dir, filename).getPath());
+        File baseDir = getProject().resolveFile(dir);
+        File file = FILE_UTILS.resolveFile(baseDir, filename);
+        if (!allowFilesToEscapeDest && !FILE_UTILS.isLeadingPath(baseDir, file, true)) {
+            log("skipping " + filename + " as its target " + FILE_UTILS.getResolvedPath(file)
+                + " is outside of " + FILE_UTILS.getResolvedPath(baseDir) + ".", Project.MSG_WARN);
+            skipped++;
+            return;
+        }
         OutputStream outstream = null;
         try {
             if (newerOnly && isUpToDate(ftp, file, resolveFile(filename))) {
