@@ -357,7 +357,9 @@ connection.</p>
     <td>useSecureDataChannel</td>
     <td>Whether to use a secure data channel when ftps is enabled. Boolean, which when
       set to <var>true</var>, will execute a "PROT P" command to enable the secure data
-      channel. Defaults to <var>false</var> and the value is ignored when ftps is not enabled.<br/>
+      channel. Since Ant 1.10.18 it defaults to <var>true</var> while
+      it defaulted to <var>false</var> in Ant 1.10.15 to 1.10.17. The
+      value is ignored completely when ftps is not enabled.<br/>
       <em>Since Ant 1.10.15</em></td>
     <td>No</td>
   </tr>

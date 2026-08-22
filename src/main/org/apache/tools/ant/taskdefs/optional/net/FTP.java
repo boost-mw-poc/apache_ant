@@ -116,7 +116,7 @@ public class FTP extends Task implements FTPTaskConfig {
     private String password;
     private String account;
     private boolean useFtps = false;
-    private boolean useSecureDataChannel = false;
+    private boolean useSecureDataChannel = true;
     private HostnameVerifier hostnameVerifier;
     private File listing;
     private boolean binary = true;
