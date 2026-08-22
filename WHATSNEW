@@ -23,7 +23,7 @@ Other changes:
    Part of Bugzilla Report 61269
 
  * a new method getBuildDate in Project can now be used to calculate a
-   notion of a "uild date" that consults the SOURCE_DATE_EPOCH environment
+   notion of a "build date" that consults the SOURCE_DATE_EPOCH environment
    variable as well as the magic ant.tstamp.now and ant.tstamp.now.iso
    properties in this order which you can use if you want to obtain a
    reproducible timestamp in tasks you write yourself.
