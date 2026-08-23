@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      https://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<project default="antunit" xmlns:au="antlib:org.apache.ant.antunit">
+
+  <import file="../../antunit-base.xml"/>
+
+  <target name="setUp">
+    <echo file="${input}/a.txt">a</echo>
+    <echo file="${input}/b.dat">b</echo>
+    <echo file="${input}/c.txt">c</echo>
+  </target>
+
+  <target name="testMultipleMappingsSkipsUnmappedResources">
+    <mappedresources id="mapped" enableMultipleMappings="true">
+      <filelist dir="${input}" files="a.txt,b.dat,c.txt"/>
+      <globmapper from="*.txt" to="*.bak"/>
+    </mappedresources>
+    <resourcecount property="count">
+      <mappedresources refid="mapped"/>
+    </resourcecount>
+    <au:assertPropertyEquals name="count" value="2"/>
+    <pathconvert property="names" pathsep=",">
+      <mappedresources refid="mapped"/>
+    </pathconvert>
+    <au:assertPropertyEquals name="names" value="a.bak,c.bak"/>
+  </target>
+
+  <target name="testMultipleMappingsIsEmptyWhenNothingMaps">
+    <mappedresources id="mapped" enableMultipleMappings="true">
+      <filelist dir="${input}" files="a.txt,b.dat,c.txt"/>
+      <globmapper from="*.nomatch" to="*.bak"/>
+    </mappedresources>
+    <resourcecount property="count">
+      <mappedresources refid="mapped"/>
+    </resourcecount>
+    <au:assertPropertyEquals name="count" value="0"/>
+    <au:assertEquals expected="" actual="${toString:mapped}"/>
+  </target>
+
+  <target name="testMultipleMappingsKeepsEveryMappedName">
+    <mappedresources id="mapped" enableMultipleMappings="true">
+      <filelist dir="${input}" files="a.txt,b.dat"/>
+      <compositemapper>
+        <globmapper from="a.*" to="one.*"/>
+        <globmapper from="a.*" to="two.*"/>
+      </compositemapper>
+    </mappedresources>
+    <resourcecount property="count">
+      <mappedresources refid="mapped"/>
+    </resourcecount>
+    <au:assertPropertyEquals name="count" value="2"/>
+    <pathconvert property="names" pathsep=",">
+      <mappedresources refid="mapped"/>
+    </pathconvert>
+    <au:assertPropertyEquals name="names" value="one.txt,two.txt"/>
+  </target>
+
+  <target name="testMultipleMappingsWithCachingIsStableAcrossIterations">
+    <mappedresources id="mapped" enableMultipleMappings="true" cache="true">
+      <filelist dir="${input}" files="a.txt,b.dat,c.txt"/>
+      <globmapper from="*.txt" to="*.bak"/>
+    </mappedresources>
+    <pathconvert property="first" pathsep=",">
+      <mappedresources refid="mapped"/>
+    </pathconvert>
+    <pathconvert property="second" pathsep=",">
+      <mappedresources refid="mapped"/>
+    </pathconvert>
+    <au:assertPropertyEquals name="first" value="a.bak,c.bak"/>
+    <au:assertPropertyEquals name="second" value="a.bak,c.bak"/>
+  </target>
+
+  <target name="testCopyWithNonMatchingMapper">
+    <mkdir dir="${output}"/>
+    <copy todir="${output}">
+      <mappedresources enableMultipleMappings="true">
+        <filelist dir="${input}" files="a.txt,b.dat,c.txt"/>
+        <globmapper from="*.dat" to="*.copied"/>
+      </mappedresources>
+    </copy>
+    <au:assertFileExists file="${output}/b.copied"/>
+    <au:assertFileDoesntExist file="${output}/a.txt"/>
+    <au:assertFileDoesntExist file="${output}/a.copied"/>
+    <au:assertFilesMatch expected="${input}/b.dat"
+                         actual="${output}/b.copied"/>
+  </target>
+</project>
