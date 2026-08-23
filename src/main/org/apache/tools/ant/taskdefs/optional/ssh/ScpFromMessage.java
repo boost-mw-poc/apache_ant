@@ -243,11 +243,16 @@ public class ScpFromMessage extends AbstractSshMessage {
             if (serverResponse.charAt(0) == 'C') {
                 parseAndFetchFile(serverResponse, startFile, out, in);
             } else if (serverResponse.charAt(0) == 'D') {
-                startFile = parseAndCreateDirectory(serverResponse,
-                                                    startFile);
+                File f = parseAndCreateDirectory(serverResponse, startFile);
+                if (f != null) {
+                    startFile = f;
+                }
                 sendAck(out);
             } else if (serverResponse.charAt(0) == 'E') {
-                startFile = startFile.getParentFile();
+                File f = startFile.getParentFile();
+                if (f != null) {
+                    startFile = f;
+                }
                 sendAck(out);
             } else if (serverResponse.charAt(0) == '\01'
                     || serverResponse.charAt(0) == '\02') {
@@ -265,7 +270,8 @@ public class ScpFromMessage extends AbstractSshMessage {
         final String directoryName = serverResponse.substring(start + 1);
         if (localFile.isDirectory()) {
             final File dir = FILE_UTILS.resolveFile(localFile, directoryName);
-            if (FILE_UTILS.isLeadingPath(this.localFile, dir) || getAllowFilesToEscapeDest()) {
+            if (FILE_UTILS.isLeadingPath(this.localFile, dir, true)
+                || getAllowFilesToEscapeDest()) {
                 dir.mkdir();
                 log("Creating: " + dir);
                 return dir;
@@ -290,7 +296,8 @@ public class ScpFromMessage extends AbstractSshMessage {
         final File transferFile = localFile.isDirectory()
                 ? new File(localFile, filename)
                 : localFile;
-        if (FILE_UTILS.isLeadingPath(this.localFile, transferFile) || getAllowFilesToEscapeDest()) {
+        if (FILE_UTILS.isLeadingPath(this.localFile, transferFile, true)
+            || getAllowFilesToEscapeDest()) {
             fetchFile(transferFile, filesize, out, in);
         } else {
             log("Skipping: " + filename + " as target " + FILE_UTILS.getResolvedPath(transferFile)

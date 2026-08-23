@@ -188,7 +188,8 @@ public class ScpFromMessageBySftp extends ScpFromMessage {
                 }
 
                 File newDir = FILE_UTILS.resolveFile(localFile, name);
-                if (FILE_UTILS.isLeadingPath(this.localFile, newDir) || getAllowFilesToEscapeDest()) {
+                if (FILE_UTILS.isLeadingPath(this.localFile, newDir, true)
+                    || getAllowFilesToEscapeDest()) {
                     getDir(channel,
                            channel.pwd() + "/" + name + "/",
                            newDir);
@@ -219,7 +220,8 @@ public class ScpFromMessageBySftp extends ScpFromMessage {
 
         if (localFile.isDirectory()) {
             localFile = new File(localFile, remoteFile);
-            if (!FILE_UTILS.isLeadingPath(this.localFile, localFile) && !getAllowFilesToEscapeDest()) {
+            if (!FILE_UTILS.isLeadingPath(this.localFile, localFile, true)
+                && !getAllowFilesToEscapeDest()) {
                 log("Skipping: " + remoteFile + " as target " + FILE_UTILS.getResolvedPath(localFile)
                     + " is outside " +  FILE_UTILS.getResolvedPath(this.localFile));
                 return;
