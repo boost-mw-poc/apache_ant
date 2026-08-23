@@ -16,7 +16,7 @@ REM  See the License for the specific language governing permissions and
 REM  limitations under the License.
 
 set REAL_ANT_HOME=%ANT_HOME%
-set ANT_HOME=%~dp0\bootstrap
+set ANT_HOME=%~dp0bootstrap
 if exist bootstrap\lib\ant.jar if exist bootstrap\bin\ant.bat if exist bootstrap\bin\lcp.bat if exist bootstrap\bin\antRun.bat goto runAnt
 call bootstrap.bat
 if exist bootstrap\lib\ant.jar if exist bootstrap\bin\ant.bat if exist bootstrap\bin\lcp.bat if exist bootstrap\bin\antRun.bat goto runAnt
