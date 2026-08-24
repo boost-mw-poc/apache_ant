@@ -103,6 +103,7 @@ public class FTPTask extends Task implements FTPTaskConfig {
     private String siteCommand = null;
     private String initialSiteCommand = null;
     private boolean enableRemoteVerification = true;
+    private boolean allowFilesToEscapeDest = false;
 
     private Path classpath;
     private ClassLoader mirrorLoader;
@@ -726,6 +727,23 @@ public class FTPTask extends Task implements FTPTaskConfig {
 
     public boolean getEnableRemoteVerification() {
         return enableRemoteVerification;
+    }
+
+    /**
+     * Whether to allow the retrieved files or directories to be outside of the dest directory.
+     *
+     * @param b the flag
+     * @since Ant 1.10.18
+     */
+    public void setAllowFilesToEscapeDest(boolean b) {
+        allowFilesToEscapeDest = b;
+    }
+
+    /**
+     * @since Ant 1.10.18
+     */
+    public boolean getAllowFilesToEscapeDest() {
+        return allowFilesToEscapeDest;
     }
 
     /**
