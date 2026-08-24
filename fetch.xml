@@ -143,32 +143,10 @@ Set -Ddest=LOCATION on the command line
     </macrodef>
   </target>
 
-  <target name="nonm2-macros" depends="pick-dest">
-    <macrodef name="get-ftp-file">
-      <attribute name="host"/>
-      <attribute name="port" default="21"/>
-      <attribute name="remotedir"/>
-      <attribute name="filename"/>
-      <attribute name="localdir" default="${dest.dir}"/>
-      <attribute name="user" default="anonymous"/>
-      <attribute name="pw" default="anonymous"/>
-      <sequential>
-        <ftp server="@{host}" port="@{port}" userid="@{user}" password="@{pw}" passive="true"
-             remotedir="@{remotedir}" action="get" depends="true" preserveLastModified="true"
-             skipFailedTransfers="true">
-          <fileset dir="@{localdir}">
-            <include name="@{filename}"/>
-          </fileset>
-        </ftp>
-      </sequential>
-    </macrodef>
-  </target>
-
-
   <!-- any init stuff -->
   <target name="init" depends="macros"/>
 
-  <target name="init-no-m2" depends="nonm2-macros"/>
+  <target name="init-no-m2" depends="pick-dest"/>
 
   <target name="init-cache">
     <available property="temp.cache.already.exists" file="${temp.dir}" type="dir"/>
