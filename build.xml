@@ -3042,6 +3042,10 @@ ${antunit.reports}
         <exclude name="**/*.asc"/>
         <exclude name="**/*.sha512"/>
       </fileset>
+      <fileset dir="${dist.base.manual}/">
+        <exclude name="**/*.asc"/>
+        <exclude name="**/*.sha512"/>
+      </fileset>
     </checksums>
   </target>
 </project>
