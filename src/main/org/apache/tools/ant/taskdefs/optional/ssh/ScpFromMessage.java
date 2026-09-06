@@ -43,11 +43,13 @@ public class ScpFromMessage extends AbstractSshMessage {
     private static final int HUNDRED_KILOBYTES = 102400;
     private static final byte LINE_FEED = 0x0a;
     private static final int BUFFER_SIZE = 100 * 1024;
+    private static final FileUtils FILE_UTILS = FileUtils.getFileUtils();
 
     private String remoteFile;
     private File localFile;
     private boolean isRecursive = false;
     private boolean preserveLastModified = false;
+    private boolean allowFilesToEscapeDest = false;
 
     /**
      * Constructor for ScpFromMessage
@@ -145,6 +147,35 @@ public class ScpFromMessage extends AbstractSshMessage {
     }
 
     /**
+     * Constructor for ScpFromMessage.
+     * @param verbose if true log extra information
+     * @param session the Scp session to use
+     * @param aRemoteFile the remote file name
+     * @param aLocalFile  the local file
+     * @param recursive   if true use recursion (-r option to scp)
+     * @param preserveLastModified whether to preserve file
+     * @param compressed  if true use compression (-C option to scp)
+     * modification times
+     * @param allowFilesToEscapeDest if true files and directories retrieved may be places outside of the aLocalFile directory.
+     * @since Ant 1.10.18
+     */
+    public ScpFromMessage(boolean verbose,
+                          Session session,
+                          String aRemoteFile,
+                          File aLocalFile,
+                          boolean recursive,
+                          boolean preserveLastModified,
+                          boolean compressed,
+                          boolean allowFilesToEscapeDest) {
+        super(verbose, compressed, session);
+        this.remoteFile = aRemoteFile;
+        this.localFile = aLocalFile;
+        this.isRecursive = recursive;
+        this.preserveLastModified = preserveLastModified;
+        this.allowFilesToEscapeDest = allowFilesToEscapeDest;
+    }
+
+    /**
      * Carry out the transfer.
      * @throws IOException on i/o errors
      * @throws JSchException on errors detected by scp
@@ -181,6 +212,13 @@ public class ScpFromMessage extends AbstractSshMessage {
         return preserveLastModified;
     }
 
+    /**
+     * @since Ant 1.10.18
+     */
+    protected boolean getAllowFilesToEscapeDest() {
+        return allowFilesToEscapeDest;
+    }
+
     private void startRemoteCpProtocol(final InputStream in,
                                        final OutputStream out,
                                        final File localFile)
@@ -205,11 +243,16 @@ public class ScpFromMessage extends AbstractSshMessage {
             if (serverResponse.charAt(0) == 'C') {
                 parseAndFetchFile(serverResponse, startFile, out, in);
             } else if (serverResponse.charAt(0) == 'D') {
-                startFile = parseAndCreateDirectory(serverResponse,
-                                                    startFile);
+                File f = parseAndCreateDirectory(serverResponse, startFile);
+                if (f != null) {
+                    startFile = f;
+                }
                 sendAck(out);
             } else if (serverResponse.charAt(0) == 'E') {
-                startFile = startFile.getParentFile();
+                File f = startFile.getParentFile();
+                if (f != null) {
+                    startFile = f;
+                }
                 sendAck(out);
             } else if (serverResponse.charAt(0) == '\01'
                     || serverResponse.charAt(0) == '\02') {
@@ -220,16 +263,20 @@ public class ScpFromMessage extends AbstractSshMessage {
     }
 
     private File parseAndCreateDirectory(final String serverResponse,
-                                         final File localFile) {
+                                         final File localFile) throws IOException {
         int start = serverResponse.indexOf(' ');
         // appears that the next token is not used and it's zero.
         start = serverResponse.indexOf(' ', start + 1);
         final String directoryName = serverResponse.substring(start + 1);
         if (localFile.isDirectory()) {
-            final File dir = new File(localFile, directoryName);
-            dir.mkdir();
-            log("Creating: " + dir);
-            return dir;
+            final File dir = FILE_UTILS.resolveFile(localFile, directoryName);
+            if (FILE_UTILS.isLeadingPath(this.localFile, dir, true)
+                || getAllowFilesToEscapeDest()) {
+                dir.mkdir();
+                log("Creating: " + dir);
+                return dir;
+            }
+            log("Skipping: " + dir + " as target " + FILE_UTILS.getResolvedPath(dir) + " is outside " +  FILE_UTILS.getResolvedPath(this.localFile));
         }
         return null;
     }
@@ -249,7 +296,14 @@ public class ScpFromMessage extends AbstractSshMessage {
         final File transferFile = localFile.isDirectory()
                 ? new File(localFile, filename)
                 : localFile;
-        fetchFile(transferFile, filesize, out, in);
+        if (FILE_UTILS.isLeadingPath(this.localFile, transferFile, true)
+            || getAllowFilesToEscapeDest()) {
+            fetchFile(transferFile, filesize, out, in);
+        } else {
+            log("Skipping: " + filename + " as target " + FILE_UTILS.getResolvedPath(transferFile)
+                + " is outside " +  FILE_UTILS.getResolvedPath(this.localFile));
+            consume(filesize, out, in);
+        }
         waitForAck(in);
         sendAck(out);
     }
@@ -307,6 +361,23 @@ public class ScpFromMessage extends AbstractSshMessage {
         }
     }
 
+    private void consume(long filesize,
+                         final OutputStream out,
+                         final InputStream in)
+        throws IOException, JSchException {
+        final byte[] buf = new byte[BUFFER_SIZE];
+        sendAck(out);
+
+        while (filesize > 0) {
+            int length = in.read(buf, 0,
+                                 BUFFER_SIZE < filesize ? BUFFER_SIZE : (int) filesize);
+            if (length < 0) {
+                throw new EOFException("Unexpected end of stream.");
+            }
+            filesize -= length;
+        }
+    }
+
     private void setLastModified(final File localFile) throws JSchException {
         SftpATTRS fileAttributes = null;
         final ChannelSftp channel = openSftpChannel();
@@ -321,7 +392,7 @@ public class ScpFromMessage extends AbstractSshMessage {
         } finally {
             channel.disconnect();
         }
-        FileUtils.getFileUtils().setFileLastModified(localFile,
+        FILE_UTILS.setFileLastModified(localFile,
                 ((long) fileAttributes.getMTime()) * 1000);
     }
 

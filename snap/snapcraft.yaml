@@ -14,7 +14,7 @@
 # limitations under the License.
 
 name: ant
-version: "1.10.18alpha"
+version: "1.10.19alpha"
 title: Apache Ant
 summary: Apache Ant
 contact:

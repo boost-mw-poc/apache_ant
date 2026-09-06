@@ -1,5 +1,22 @@
+Changes from Ant 1.10.18 TO Ant 1.10.19
+=======================================
+
 Changes from Ant 1.10.17 TO Ant 1.10.18
 =======================================
+
+Changes that could break older environments:
+-------------------------------------------
+
+ * the default value for <ftp>'s useSecureDataChannel has been changed
+   to true which means using ftps now also tries to use an encrypted
+   data channel by default.
+
+ * the <ftp> and <scp> tasks have new allowFilesToEscapeDest
+   attributes. When set to false - which is the default - te tasks will
+   not download files or create directories outside the designated
+   destination directory when downloading from the remote server.
+   In the unlikely case you need the old bahaviour of writing outside
+   the destination directory you must set the value to true explicitly.
 
 Other changes:
 --------------

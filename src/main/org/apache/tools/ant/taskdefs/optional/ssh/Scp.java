@@ -59,6 +59,7 @@ public class Scp extends SSHBase {
     private boolean isFromRemote, isToRemote;
     private boolean isSftp = false;
     private Integer fileMode, dirMode;
+    private boolean allowFilesToEscapeDest = false;
 
     /**
      * Sets the file to be transferred.  This can either be a remote
@@ -222,6 +223,16 @@ public class Scp extends SSHBase {
     }
 
     /**
+     * Whether to allow the retrieved files or directories to be outside of the dest directory.
+     *
+     * @param b the flag
+     * @since Ant 1.10.18
+     */
+    public void setAllowFilesToEscapeDest(boolean b) {
+        allowFilesToEscapeDest = b;
+    }
+
+    /**
      * Adds a FileSet transfer to remote host.  NOTE: Either
      * addFileSet() or setFile() are required.  But, not both.
      *
@@ -312,13 +323,15 @@ public class Scp extends SSHBase {
                                        getProject().resolveFile(toPath),
                                        fromSshUri.endsWith("*"),
                                        preserveLastModified,
-                                       compressed);
+                                       compressed,
+                                       allowFilesToEscapeDest);
             } else {
                 message =
                     new ScpFromMessageBySftp(getVerbose(), session, file,
                                              getProject().resolveFile(toPath),
                                              fromSshUri.endsWith("*"),
-                                             preserveLastModified);
+                                             preserveLastModified,
+                                             allowFilesToEscapeDest);
             }
             log("Receiving file: " + file);
             message.setLogListener(this);

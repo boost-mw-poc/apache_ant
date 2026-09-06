@@ -1632,10 +1632,18 @@ public class FTPTaskMirrorImpl implements FTPTaskMirror {
      */
     protected void getFile(FTPClient ftp, String dir, String filename)
         throws IOException, BuildException {
+        File baseDir = task.getProject().resolveFile(dir);
+        File file = FILE_UTILS.resolveFile(baseDir, filename);
+        if (!task.getAllowFilesToEscapeDest()
+            && !FILE_UTILS.isLeadingPath(baseDir, file, true)) {
+            task.log("skipping " + filename + " as its target " + FILE_UTILS.getResolvedPath(file)
+                + " is outside of " + FILE_UTILS.getResolvedPath(baseDir) + ".", Project.MSG_WARN);
+            skipped++;
+            return;
+        }
+
         OutputStream outstream = null;
         try {
-            File file = task.getProject().resolveFile(new File(dir, filename).getPath());
-
             if (task.isNewer() && isUpToDate(ftp, file, resolveFile(filename))) {
                 return;
             }
